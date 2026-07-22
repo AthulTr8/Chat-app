@@ -1,7 +1,10 @@
 import { Box, Divider, IconButton, Link, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { DownloadSimple, Image } from 'phosphor-react';
+import { DotsThreeVertical, DownloadSimple, Image } from 'phosphor-react';
 import React from 'react'
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { Message_options } from '../../data';
 
 const TimeLine = ({ el }) => {
 
@@ -24,7 +27,7 @@ const TimeLine = ({ el }) => {
 const TestMsg = ({ el }) => {
     const theme = useTheme();
     return (
-        <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"}>
+        <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"} >
             <Box sx={{
                 background: el.incoming ? theme.palette.background.default : theme.palette.primary.main,
                 borderRadius: 1.5,
@@ -35,6 +38,8 @@ const TestMsg = ({ el }) => {
                 </Typography>
 
             </Box>
+            <MessageOptions />
+
         </Stack>
     )
 }
@@ -57,6 +62,7 @@ const MediaMsg = ({ el }) => {
                 </Stack>
 
             </Box>
+            <MessageOptions />
         </Stack>
 
     )
@@ -84,6 +90,7 @@ const ReplyMsg = ({ el }) => {
                     </Typography>
                 </Stack>
             </Box>
+            <MessageOptions />
         </Stack>
     )
 }
@@ -115,6 +122,7 @@ const LinkMsg = ({ el }) => {
                     </Stack>
                 </Stack>
             </Box>
+            <MessageOptions />
         </Stack>
 
     )
@@ -134,23 +142,66 @@ const Docmsg = (el) => {
             }} p={1.5}>
                 <stack spacing={3}>
                     <Stack sx={{ background: theme.palette.background.paper, borderRadius: 1 }} p={2} spacing={3} direction={'row'} alignItems={'center'}>
-                        <Image size={48}/>
+                        <Image size={48} />
                         <Typography variant='caption'>Abstract.pdf</Typography>
                         <IconButton>
-                            <DownloadSimple/>
+                            <DownloadSimple />
                         </IconButton>
                     </Stack>
                     <Typography variant='body2' color={el.incoming ? theme.palette.text : "#fff"}>
-                    {el.message}
+                        {el.message}
                     </Typography>
                 </stack>
             </Box>
+            <MessageOptions />
         </Stack>
     )
 }
 
 
+const MessageOptions = () => {
+    const id = React.useId();
+    const buttonId = `${id}-button`;
+    const menuId = `${id}-menu`;
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    return (
+        <>
+            <DotsThreeVertical
+                id={buttonId}
+                aria-controls={open ? menuId : undefined}
+                aria-haspopup="true"
+                aria-expanded={open}
+                onClick={handleClick} size={20} />
+            <Menu
 
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                slotProps={{
+                    list: {
+                        'aria-labelledby': buttonId,
+                    },
+                }}
+            >
+                <Stack>
+                    {Message_options.map((el) => (
+                        <MenuItem >{el.title}
+                        </MenuItem>
+                    ))}
+
+                </Stack>
+
+            </Menu>
+        </>
+    )
+}
 
 
 
