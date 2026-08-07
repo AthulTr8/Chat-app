@@ -32,21 +32,21 @@ const ChatInput = ({ setOpenPicker }) => {
                 <Stack sx={{ width: "max-contents" }}>
                     <Stack sx={{ position: "relative", display: openAction ? "inline-block" : "none" }}>
                         {Actions.map((el) => (
-                             <Tooltip placement='right' title={el.title}>
-      
-    
-                            <Fab sx={{position: "absolute", top: -el.y, background: el.color}}>
-                                {el.icon}
-                               
-                            </Fab>
-                             </Tooltip>
+                            <Tooltip placement='right' title={el.title}>
+
+
+                                <Fab sx={{ position: "absolute", top: -el.y, background: el.color }}>
+                                    {el.icon}
+
+                                </Fab>
+                            </Tooltip>
                         ))}
                     </Stack>
                     <InputAdornment>
-                        <IconButton 
-                        onClick={() =>{
-                            setOpenAction((prev) => !prev);
-                        }}>
+                        <IconButton
+                            onClick={() => {
+                                setOpenAction((prev) => !prev);
+                            }}>
                             <LinkSimple />
                         </IconButton>
                     </InputAdornment>
@@ -98,7 +98,7 @@ const Actions = [
 
 const Footer = () => {
     const theme = useTheme();
-    const [openPicker, setOpenPicker ] = React.useState(false);
+    const [openPicker, setOpenPicker] = React.useState(false);
 
     return (
         <Box p={1} sx={{
@@ -115,7 +115,7 @@ const Footer = () => {
                             theme={theme.palette.mode} data={data} onEmojiSelect={console.log} />
                     </Box>
 
-                    <ChatInput setOpenPicker={setOpenPicker}  />
+                    <ChatInput setOpenPicker={setOpenPicker} />
                 </Stack>
 
 

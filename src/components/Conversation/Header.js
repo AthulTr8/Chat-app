@@ -4,9 +4,13 @@ import { Avatar, Box, Divider, IconButton, Stack, Typography } from '@mui/materi
 import { useTheme } from '@mui/material/styles'
 import { StyledBadge } from '../../components/StyleBadge'
 import { CaretDown, MagnifyingGlass, PhoneCall, VideoCamera } from 'phosphor-react'
+// import { dispatch } from '../../redux/store'
+import { toggleSideBar } from '../../redux/slices/app'
+import { useDispatch } from 'react-redux'
 
 const Header = () => {
     const theme = useTheme();
+    const dispatch = useDispatch();
     return (
         <Box sx={{
             width: "100%", background:
@@ -14,7 +18,9 @@ const Header = () => {
                     : theme.palette.background.paper, boxShadow: "0 0 2px rgba(0, 0, 0, .25)"
         }} p={2}>
             <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ width: "100%" }}>
-                <Stack direction={'row'} spacing={2} >
+                <Stack onClick={
+                    () => { dispatch(toggleSideBar()) }
+                } direction={'row'} spacing={2} >
                     <Box>
                         <StyledBadge>
                             {/* <Avatar alt={faker.name.fullName()} src={`https://api.dicebear.com/9.x/initials/svg?seed=${data?.name || "User"}`}/> */}

@@ -24,7 +24,7 @@ const TimeLine = ({ el }) => {
 }
 
 
-const TestMsg = ({ el }) => {
+const TestMsg = ({ el, menu }) => {
     const theme = useTheme();
     return (
         <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"} >
@@ -38,7 +38,8 @@ const TestMsg = ({ el }) => {
                 </Typography>
 
             </Box>
-            <MessageOptions />
+            {menu && <MessageOptions /> }
+            
 
         </Stack>
     )
@@ -46,7 +47,7 @@ const TestMsg = ({ el }) => {
 
 
 
-const MediaMsg = ({ el }) => {
+const MediaMsg = ({ el, menu }) => {
     const theme = useTheme();
 
     return (
@@ -62,7 +63,8 @@ const MediaMsg = ({ el }) => {
                 </Stack>
 
             </Box>
-            <MessageOptions />
+             {menu && <MessageOptions /> }
+            
         </Stack>
 
     )
@@ -70,7 +72,7 @@ const MediaMsg = ({ el }) => {
 
 
 
-const ReplyMsg = ({ el }) => {
+const ReplyMsg = ({ el, menu }) => {
     const theme = useTheme();
     return (
         <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"}>
@@ -90,14 +92,14 @@ const ReplyMsg = ({ el }) => {
                     </Typography>
                 </Stack>
             </Box>
-            <MessageOptions />
+             {menu && <MessageOptions /> }
         </Stack>
     )
 }
 
 
 
-const LinkMsg = ({ el }) => {
+const LinkMsg = ({ el, menu }) => {
     const theme = useTheme();
     return (
 
@@ -122,7 +124,7 @@ const LinkMsg = ({ el }) => {
                     </Stack>
                 </Stack>
             </Box>
-            <MessageOptions />
+            {menu && <MessageOptions /> }
         </Stack>
 
     )
@@ -131,7 +133,7 @@ const LinkMsg = ({ el }) => {
 
 
 
-const Docmsg = (el) => {
+const Docmsg = (el, menu) => {
     const theme = useTheme();
     return (
         <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"}>
@@ -153,7 +155,7 @@ const Docmsg = (el) => {
                     </Typography>
                 </stack>
             </Box>
-            <MessageOptions />
+            {menu && <MessageOptions /> }
         </Stack>
     )
 }
