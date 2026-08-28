@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import Formprovider, { RHFTextField } from '../../components/hook-form'
 import * as Yup from "yup"
-import {  useForm } from "react-hook-form" //reactForm,
+import { useForm } from "react-hook-form" //reactForm,
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Alert, Button, IconButton, InputAdornment, Link, Stack } from '@mui/material'
 import { Eye, EyeClosed, EyeSlash } from 'phosphor-react'
 import { Link as RouterLink } from 'react-router-dom'
+import { useDispatch } from "react-redux"
+import { loginUser } from '../../redux/slices/auth'
+
+
 const LoginForm = () => {
-// const theme = useTheme()
+  // const theme = useTheme()
+  const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false);
 
   const loginSchema = Yup.object().shape({
@@ -29,7 +34,7 @@ const LoginForm = () => {
 
   const onsubmit = async (data) => {
     try {
-
+      dispatch(loginUser(data))
     } catch (error) {
       console.log(error)
       reset();
@@ -62,15 +67,16 @@ const LoginForm = () => {
           }}
         />
       </Stack>
-      <Stack  alignItems={'flex-end'} sx={{my:3}}>
+      <Stack alignItems={'flex-end'} sx={{ my: 3 }}>
         <Link component={RouterLink} to="/auth/reset-password" variant='body2' color={'inherit'} underline='always'>Forgot password?</Link>
       </Stack>
       <Button fullWidth type='submit' color='inherit' size='large' variant='contained'
-      sx={{bgcolor:'text.primary', color:(theme) => theme.palette.mode ==="light"? "common.white":"grey.800",
-        "&:hover":{
-          bgcolor:'text.primary', color:(theme) => theme.palette.mode ==="light"? "common.white":"grey.800"
-        }
-      }}>Login</Button>
+        sx={{
+          bgcolor: 'text.primary', color: (theme) => theme.palette.mode === "light" ? "common.white" : "grey.800",
+          "&:hover": {
+            bgcolor: 'text.primary', color: (theme) => theme.palette.mode === "light" ? "common.white" : "grey.800"
+          }
+        }}>Login</Button>
     </Formprovider>
   )
 }

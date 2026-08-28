@@ -58,6 +58,7 @@ export const allLangs = [
 
 export const defaultLang = allLangs[0]; // English
 
+export const BASE_URL= "http://localhost:3030"
 
 
 // DEFAULT ROOT PATH

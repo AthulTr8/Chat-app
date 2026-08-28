@@ -37,7 +37,7 @@
 //     const open = Boolean(anchorEl);
 //     const handleClick = (event) => {
 //         setAnchorEl(event.currentTarget);
-        
+
 //     };
 //     const handleClose = () => {
 //         setAnchorEl(null);
@@ -195,6 +195,8 @@ import { faker } from "@faker-js/faker";
 import useSettings from "../../hooks/useSettings"
 import { MaterialUISwitch } from "../../components/MaterialUISwitch"
 import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../redux/slices/auth';
+import { useDispatch } from 'react-redux';
 
 const getPath = (index) => {
     switch (index) {
@@ -225,11 +227,12 @@ const getMenuPath = (index) => {
 }
 
 const SideBar = () => {
+    const dispatch = useDispatch();
     const theme = useTheme();
     const navigate = useNavigate();
     const [selected, setSelectedIndex] = useState(0);
     const { onToggleMode } = useSettings();
-    
+
     const id = React.useId();
     const buttonId = `${id}-button`;
     const menuId = `${id}-menu`;
@@ -298,9 +301,9 @@ const SideBar = () => {
                                     {el.icon}
                                 </IconButton>
                         ))}
-                        
+
                         <Divider sx={{ width: "50px" }} />
-                        
+
                         {selected === 3 ? (
                             <Box
                                 sx={{
@@ -309,7 +312,7 @@ const SideBar = () => {
                                 }}
                             >
                                 <IconButton onClick={() => { navigate("Settings") }}
-                                 sx={{ width: "max-content", color: "#fff" }}>
+                                    sx={{ width: "max-content", color: "#fff" }}>
                                     <Gear />
                                 </IconButton>
                             </Box>
@@ -338,9 +341,9 @@ const SideBar = () => {
                         aria-controls={open ? menuId : undefined}
                         aria-haspopup="true"
                         aria-expanded={open}
-                        onClick={handleClick} 
-                        sx={{ width: 40, height: 40, cursor: 'pointer' }} 
-                        src={faker.internet.avatar()} 
+                        onClick={handleClick}
+                        sx={{ width: 40, height: 40, cursor: 'pointer' }}
+                        src={faker.internet.avatar()}
                     />
                     <Menu
                         id={menuId}
@@ -357,25 +360,31 @@ const SideBar = () => {
                             horizontal: "left"
                         }}
                         anchorOrigin={{
-                            vertical: "top", 
+                            vertical: "top",
                             horizontal: "right"
                         }}
                     >
                         <Stack>
                             {Profile_Menu.map((el, index) => (
                                 /* FIXED: Passes the current index to the refactored menu navigation handler */
-                                <MenuItem key={index} onClick={() => handleProfileMenuClick(index)}>
-                                    <Stack sx={{ width: 100 }} direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                                        <span>{el.title}</span>
-                                        {el.icon}
-                                    </Stack>
-                                </MenuItem>
+                                <MenuItem key={index} onClick={() =>{
+                                    handleProfileMenuClick(index)
+                                    if (index === 2) {
+                                        dispatch(logoutUser())
+                                    }
+                                    
+                                }}>
+                            <Stack sx={{ width: 100 }} direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+                                <span>{el.title}</span>
+                                {el.icon}
+                            </Stack>
+                        </MenuItem>
                             ))}
-                        </Stack>
-                    </Menu>
                 </Stack>
-            </Stack>
-        </Box>
+            </Menu>
+        </Stack>
+            </Stack >
+        </Box >
     )
 }
 

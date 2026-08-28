@@ -4,15 +4,46 @@ import Router from "./routes";
 import ThemeProvider from './theme';
 // components
 import ThemeSettings from './components/settings';
+import { Snackbar } from "@mui/material";
+import React from "react";
+import MuiAlert from "@mui/material/Alert"
+import { useDispatch, useSelector } from "react-redux";
+import { closeSnackBar } from "./redux/slices/app";
+
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
 
 function App() {
+  const fullState = useSelector((state) => state);
+  console.log("👉 CURRENT REDUX GLOBAL STORE STATE TREE:", fullState);
+
+  const { open, message, severity } = useSelector((state) => state.app.snackbar)
+  const dispatch = useDispatch()
   return (
-    <ThemeProvider>
-      <ThemeSettings>
-        {" "}
-        <Router />{" "}
-      </ThemeSettings>
-    </ThemeProvider>
+    <>
+      <ThemeProvider>
+        <ThemeSettings>
+          {" "}
+          <Router />{" "}
+        </ThemeSettings>
+      </ThemeProvider>
+      {message && open ?
+        <Snackbar anchorOrigin={{ "horizontal": "center", "vertical": "bottom" }}
+          open={open}
+          autoHideDuration={4000}
+          // key={"hi"}
+          onClose={() => {
+            dispatch(closeSnackBar())
+          }}>
+          <Alert onClose={() => { dispatch(closeSnackBar()) }} severity={severity} sx={{ width: '100%' }}>
+            {message}
+          </Alert>
+
+        </Snackbar> : <></>}
+
+    </>
+
   );
 }
 
