@@ -3,11 +3,12 @@ import {
     InputBase, Button, Divider, Avatar, Badge
 } from '@mui/material'
 import { styled, alpha, useTheme } from '@mui/material/styles'
-import React from 'react'
-import { ArchiveBox, CircleDashed, MagnifyingGlass } from 'phosphor-react'
+import React, { useState } from 'react'
+import { ArchiveBox, CircleDashed, MagnifyingGlass, Users } from 'phosphor-react'
 import { ChatList } from '../../data';
 // import { SimpleBarStyle } from '../../components/Scrollbar'
 import { StyledBadge } from '../../components/StyleBadge';
+import Friends from '../../Sections/main/Friends';
 
 // FIX 1: Pass the { data } prop directly into the component parameters
 const ChatElement = ({ data }) => {
@@ -154,6 +155,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 const Chats = () => {
+    const [openDialog, setOpenDialog] = useState(false)
+    const handleCloseDialog = ()=>{
+        setOpenDialog(false)
+    }
+    const handleOpenDialog = ()=>{
+        setOpenDialog(true)
+    }
+
     const theme = useTheme();
     return (
 
@@ -187,9 +196,17 @@ const Chats = () => {
                         <Typography variant="h5">
                             Chats
                         </Typography>
-                        <IconButton>
-                            <CircleDashed size={24} />
-                        </IconButton>
+                        <Stack direction={'row'}>
+                            <IconButton onClick={()=>{
+                                handleOpenDialog()
+                            }}>
+                                <Users size={24} />
+                            </IconButton>
+                            <IconButton>
+                                <CircleDashed size={24} />
+                            </IconButton>
+                        </Stack>
+
                     </Stack>
 
                     <Stack sx={{ width: "100%" }}>
@@ -245,69 +262,70 @@ const Chats = () => {
                     {/* </Stack>
                     </Stack> */}
                     <Box
-    sx={{
-        flex: 1,
-        overflowY: "auto",
-        overflowX: "hidden",
-        pr: 1,
+                        sx={{
+                            flex: 1,
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                            pr: 1,
 
-        "&::-webkit-scrollbar": {
-            width: "3px",
-            right: 7
-        },
+                            "&::-webkit-scrollbar": {
+                                width: "3px",
+                                right: 7
+                            },
 
-        "&::-webkit-scrollbar-track": {
-            background: "transparent",
-        },
+                            "&::-webkit-scrollbar-track": {
+                                background: "transparent",
+                            },
 
-        "&::-webkit-scrollbar-thumb": {
-            backgroundColor:
-                theme.palette.mode === "light"
-                    ? "#bdbdbd"
-                    : "#5f6368",
-            borderRadius: "20px",
-        },
+                            "&::-webkit-scrollbar-thumb": {
+                                backgroundColor:
+                                    theme.palette.mode === "light"
+                                        ? "#bdbdbd"
+                                        : "#5f6368",
+                                borderRadius: "20px",
+                            },
 
-        "&::-webkit-scrollbar-thumb:hover": {
-            backgroundColor:
-                theme.palette.mode === "light"
-                    ? "#9e9e9e"
-                    : "#80868b",
-        },
-    }}
->
-    <Stack spacing={2}>
-        <Stack>
-            <Typography
-                variant="subtitle2"
-                sx={{ color: "#676767", mb: 1 }}
-            >
-                Pinned
-            </Typography>
+                            "&::-webkit-scrollbar-thumb:hover": {
+                                backgroundColor:
+                                    theme.palette.mode === "light"
+                                        ? "#9e9e9e"
+                                        : "#80868b",
+                            },
+                        }}
+                    >
+                        <Stack spacing={2}>
+                            <Stack>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{ color: "#676767", mb: 1 }}
+                                >
+                                    Pinned
+                                </Typography>
 
-            {ChatList.filter((el) => el.pinned).map((ek) => (
-                <ChatElement key={ek.id} data={ek} />
-            ))}
-        </Stack>
+                                {ChatList.filter((el) => el.pinned).map((ek) => (
+                                    <ChatElement key={ek.id} data={ek} />
+                                ))}
+                            </Stack>
 
-        <Stack>
-            <Typography
-                variant="subtitle2"
-                sx={{ color: "#676767", mb: 1 }}
-            >
-                All Chats
-            </Typography>
+                            <Stack>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{ color: "#676767", mb: 1 }}
+                                >
+                                    All Chats
+                                </Typography>
 
-            {ChatList.filter((el) => !el.pinned).map((ek) => (
-                <ChatElement key={ek.id} data={ek} />
-            ))}
-        </Stack>
-    </Stack>
-</Box>
+                                {ChatList.filter((el) => !el.pinned).map((ek) => (
+                                    <ChatElement key={ek.id} data={ek} />
+                                ))}
+                            </Stack>
+                        </Stack>
+                    </Box>
                 </Stack>
 
 
             </Box>
+            {openDialog && <Friends open={openDialog} handleClose={handleCloseDialog}/>}
         </>
     )
 }
