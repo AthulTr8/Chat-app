@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs")
-const crypto = require("crypto")
+const crypto = require("crypto");
+const { type } = require("os");
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -59,7 +60,16 @@ const userSchema = new mongoose.Schema({
     },
     otp_expiry_time: {
         type: Date
-    }
+    },
+    socket_id: {
+        type: String
+    },
+    friends: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "User"
+        }
+    ]
 })
 // userSchema.pre("save", async function () {
 //     // 1. If password was added or changed, hash it!
@@ -72,7 +82,7 @@ const userSchema = new mongoose.Schema({
 //     } catch (error) {
 //         console.log(`error: ${error}`)
 //     }
-    
+
 
 //     // 2. If OTP was added or changed, hash it!
 //     if (this.isModified("otp") && this.otp) {
@@ -81,7 +91,7 @@ const userSchema = new mongoose.Schema({
 //             this.otp = await bcrypt.hash(otpString, 12);
 //         }
 //     }
-    
+
 //     // Notice: NO next() or return next() anywhere in this function!
 //     // Simply letting the async function finish tells Mongoose it's safe to save.
 // });
@@ -183,13 +193,13 @@ userSchema.methods.createPasswordResetToken = async function () {
     try {
         const resetToken = crypto.randomBytes(32).toString("hex")
 
-    this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex")
-    this.passwordResetExpires = Date.now() + 10 * 60 * 1000
-    return resetToken
+        this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex")
+        this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+        return resetToken
     } catch (error) {
         console.log(error)
     }
-    
+
 }
 
 userSchema.methods.changedPasswordAfter = async function (timeStamp) {
