@@ -38,7 +38,8 @@ exports.login = async (req, res, next) => {
     res.status(200).json({
         status: "Success",
         message: "Logged in successfully",
-        token: token
+        token: token,
+        user_id: user._id
     })
 
 }
@@ -321,7 +322,8 @@ exports.verifyOTP = async (req, res, next) => {
     res.status(200).json({
         status: "Success",
         message: "OTP verified successfully",
-        token: token
+        token: token,
+        user_id:user._id
     })
 
 }
@@ -341,9 +343,9 @@ exports.forgotPassword = async (req, res, next) => {
     console.log(resetToken)
     const resetURL = `https://tawk.com/auth/reset-password/?code=${resetToken}`
     try {
-      
-       await user.save({validateBeforeSave: false})
-        
+
+        await user.save({ validateBeforeSave: false })
+
         res.status(200).json({
             status: "Success",
             message: "Reset password link is send to email"
@@ -363,17 +365,17 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.resetPassword = async (req, res, next) => {
-   const tokenFromUrl = req.body.token; 
+    const tokenFromUrl = req.body.token;
 
-        if (!tokenFromUrl) {
-            return res.status(400).json({
-                status: "error",
-                message: "Reset token missing from URL"
-            });
-        }
+    if (!tokenFromUrl) {
+        return res.status(400).json({
+            status: "error",
+            message: "Reset token missing from URL"
+        });
+    }
 
-        // 2. Hash the incoming URL token to compare it safely against the DB record
-        const hashedToken = crypto.createHash("sha256").update(tokenFromUrl).digest("hex");
+    // 2. Hash the incoming URL token to compare it safely against the DB record
+    const hashedToken = crypto.createHash("sha256").update(tokenFromUrl).digest("hex");
 
     const user = await User.findOne({
         passwordResetToken: hashedToken,

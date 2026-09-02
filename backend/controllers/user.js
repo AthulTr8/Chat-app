@@ -34,21 +34,21 @@ exports.getUsers = async (req, res, next) => {
 }
 
 exports.getRequests = async (req, res, next) => {
-    const requests = await FriendRequest.find({recipient:req.user._id}).populate("sender", "_id firstName lastName")
+    const requests = await FriendRequest.find({ recipient: req.user._id }).populate("sender", "_id firstName lastName")
 
     res.status(200).json({
-        status:"Success",
+        status: "Success",
         data: requests,
-        message:"friends requests found successfully"
+        message: "friends requests found successfully"
     })
 }
 
 exports.getFriends = async (req, res, next) => {
-    const friends = await User.findById(req.user._id).populate("friends", "_id firstName lastName")
+    const this_user = await User.findById(req.user._id).populate("friends", "_id firstName lastName")
 
     res.status(200).json({
-        status:"Success",
-        data: friends,
-        message:"friends found successfully"
+        status: "Success",
+        data: this_user.friends,
+        message: "friends found successfully"
     })
 }

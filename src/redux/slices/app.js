@@ -85,7 +85,7 @@ export const closeSnackBar = () => async (dispatch, getState) => {
     dispatch(slice.actions.closeSnackBar());
 }
 
-export const fetchUsers = async () => {
+export const fetchUsers =  () => {
     return async (dispatch, getState) => {
         await axios.get("/user/get-all", {
             headers: {
@@ -100,7 +100,7 @@ export const fetchUsers = async () => {
         })
     }
 }
-export const fetchFriends = async () => {
+export const fetchFriends = () => {
     return async (dispatch, getState) => {
         await axios.get("/user/get-friends", {
             headers: {
@@ -115,7 +115,7 @@ export const fetchFriends = async () => {
         })
     }
 }
-export const fetchFriendRequests = async () => {
+export const fetchFriendRequests =  () => {
     return async (dispatch, getState) => {
         await axios.get("/user/get-friend-requests", {
             headers: {

@@ -44,10 +44,10 @@ const FriendsRequestList = () => {
         dispatch(fetchFriendRequests())
     }, [])
 
-    const { requests } = useSelector((state) => state.app)
+    const { friendRequests } = useSelector((state) => state.app)
     return (
         <>
-            {requests.map((el, idx) => {
+            {friendRequests.map((el, idx) => {
 
                 return <></>
             })}

@@ -27,7 +27,7 @@ const slice = createSlice({
             state.isLoggedIn = false
             state.token = ""
         },
-        updateRegisterEmail(state, action){
+        updateRegisterEmail(state, action) {
             state.email = action.payload.email
         }
     }
@@ -54,10 +54,11 @@ export function loginUser(formValues) {
                 isLoggedIn: true,
                 token: response.data.token
             }))
-            dispatch(showSnackBar({severity:"success", message:response.data.message}))
+            window.localStorage.setItem("user_id", response.data.user_id)
+            dispatch(showSnackBar({ severity: "success", message: response.data.message }))
         }).catch((error) => {
             console.log(error)
-            dispatch(showSnackBar({severity:"error", message: error.message}))
+            dispatch(showSnackBar({ severity: "error", message: error.message }))
         })
     }
 }
@@ -65,7 +66,9 @@ export function loginUser(formValues) {
 export function logoutUser() {
     return async (dispatch) => {
         dispatch(slice.actions.signOut())
+        window.localStorage.removeItem("user_id")
     }
+
 }
 
 export function forgotPassword(formValues) {
@@ -105,8 +108,8 @@ export function newPassword(formValues) {
 }
 
 export function RegisterUser(formValues) {
-     return async (dispatch, getState) => {
-         dispatch(slice.actions.updateIsLoading({isLoading:true, error: false}))
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }))
         await axios.post("/auth/register", {
             ...formValues
         }, {
@@ -115,16 +118,16 @@ export function RegisterUser(formValues) {
             }
         }).then((response) => {
             console.log(response)
-            dispatch(slice.actions.updateRegisterEmail({email:formValues.email}))
-            dispatch(slice.actions.updateIsLoading({isLoading:false, error: false}))
+            dispatch(slice.actions.updateRegisterEmail({ email: formValues.email }))
+            dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }))
         }).catch((error) => {
             console.log(error)
-             dispatch(slice.actions.updateIsLoading({isLoading:false, error: true}))
+            dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }))
         }).finally(() => {
             if (!getState().auth.error) {
                 window.location.href = "/auth/Verify"
             }
-            
+
         })
     }
 }
@@ -143,6 +146,8 @@ export function verifyEmail(formValues) {
                 isLoggedIn: true,
                 token: response.data.token
             }))
+
+            window.localStorage.setItem("user_id", response.data.user_id)
         }).catch((error) => {
             console.log(error)
         })
