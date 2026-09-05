@@ -69,7 +69,11 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.ObjectId,
             ref: "User"
         }
-    ]
+    ],
+    status:{
+        type: String,
+        enum: ["Online", "Offline"]
+    }
 })
 // userSchema.pre("save", async function () {
 //     // 1. If password was added or changed, hash it!

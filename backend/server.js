@@ -1,7 +1,7 @@
 const { configDotenv } = require("dotenv");
 const mongoose = require("mongoose")
 configDotenv({ path: "./config.env" })
-
+const path = require("path")
 const { Server } = require("socket.io")
 
 const app = require("./app");
@@ -37,13 +37,18 @@ server.listen(port, () => {
 
 io.on("connection", async (socket) => {
     console.log(socket)
-    const user_id = socket.handshake.query("user_id")
+    // const user_id = socket.handshake.query("user_id")
+    // Correct syntax reading it as an object property
+    const user_id = socket.handshake.query.user_id;
+
 
     const socket_id = socket.id
     console.log(`User Connected ${socket_id}`)
-
+    if (user_id === "null") {
+        return
+    }
     if (Boolean(user_id)) {
-        await User.findByIdAndUpdate(user_id, { socket_id })
+        await User.findByIdAndUpdate(user_id, { socket_id, status: "Online" })
     }
     // socket event listener here
 
@@ -94,7 +99,36 @@ io.on("connection", async (socket) => {
                 message: "Friend request accepted"
             })
         })
-        socket.on("end", function () {
+
+        // Handle text/link messages
+        socket.on("text_message", (data) => {
+            console.log("Recevied Message: ", data)
+            // data : {to, from, text}
+            // create a new conversation if it doesn't exist yet or add new
+            // save to DB
+            // emit incoming_message -> to user
+            // emit outgoing_messages -> from user
+        })
+
+        socket.on("file_message", (data) => {
+            console.log("received Message:", data)
+            // data : {to, from, text, files}
+            // get the file extension
+
+            const fileExtention = path.extname(data.file.name)
+            // generate a unique file name
+            const fileName = `${Date.now()}_${Math.floor(Math.random() * 10000)}${fileExtention}`
+            // upload files to aws s3
+            // create a new conversation if it doesn't exist yet or add new
+            // save to DB
+            // emit incoming_message -> to user
+            // emit outgoing_messages -> from user
+        })
+        socket.on("end", async (data) => {
+            // find user by _id and update status to Offline
+            if (data.user_id) {
+
+            }
             console.log("Closing Connection")
             socket.disconnect(0)
         })

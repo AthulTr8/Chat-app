@@ -1,10 +1,17 @@
 import { Avatar, Badge, Box, Stack, Typography, useTheme } from "@mui/material";
 import { StyledBadge } from "./StyleBadge";
+import { useDispatch } from "react-redux";
+import { SelectConversation } from "../redux/slices/app";
 
 export const ChatElement = ({ data }) => {
     const theme = useTheme();
+    const dispatch = useDispatch()
     return (
-        <Box sx={{
+        <Box
+        onClick = {()=>{
+            dispatch(SelectConversation({room_id: data.id}))
+        }}
+        sx={{
             width: "100%",
             background: theme.palette.mode === "light" ? "#fff" : theme.palette.background.paper,
             borderRadius: 1,
