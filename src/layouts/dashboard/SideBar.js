@@ -185,7 +185,7 @@
 
 // export default SideBar
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Avatar, Box, Divider, IconButton, Stack, Menu, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Logo from "../../assets/Images/logo.ico";
@@ -194,7 +194,7 @@ import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
 import useSettings from "../../hooks/useSettings"
 import { MaterialUISwitch } from "../../components/MaterialUISwitch"
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../redux/slices/auth';
 import { useDispatch } from 'react-redux';
 
@@ -203,11 +203,11 @@ const getPath = (index) => {
         case 0:
             return "/app";
         case 1:
-            return "group";
+            return "/group";
         case 2:
-            return "call";
+            return "/call";
         case 3:
-            return "Settings";
+            return "/settings";
         default:
             return "/app";
     }
@@ -230,8 +230,10 @@ const SideBar = () => {
     const dispatch = useDispatch();
     const theme = useTheme();
     const navigate = useNavigate();
-    const [selected, setSelectedIndex] = useState(0);
+    // const [selected, setSelectedIndex] = useState(0);
     const { onToggleMode } = useSettings();
+    const location = useLocation(); // Tracks the current active URL path (e.g., "/chat")
+
 
     const id = React.useId();
     const buttonId = `${id}-button`;
@@ -274,10 +276,10 @@ const SideBar = () => {
                     </Box>
 
                     <Stack sx={{ width: "max-content" }} direction="column" alignItems={"center"} spacing={3}>
-                        {Nav_Buttons.map((el) => (
+                        {/* {Nav_Buttons.map((el) => (
                             el.index === selected ?
                                 <Box
-                                    key={el.key}
+                                    key={el.index}
                                     sx={{
                                         background: theme.palette.primary.main,
                                         borderRadius: 1.5
@@ -290,7 +292,7 @@ const SideBar = () => {
                                     </IconButton>
                                 </Box>
                                 : <IconButton
-                                    key={el.key}
+                                    key={el.index}
                                     onClick={() => {
                                         setSelectedIndex(el.index);
                                         navigate(getPath(el.index));
@@ -300,9 +302,9 @@ const SideBar = () => {
                                     }}>
                                     {el.icon}
                                 </IconButton>
-                        ))}
-
-                        <Divider sx={{ width: "50px" }} />
+                        ))} */}
+                    
+                        {/* <Divider sx={{ width: "50px" }} />
 
                         {selected === 3 ? (
                             <Box
@@ -325,7 +327,69 @@ const SideBar = () => {
                                 sx={{ width: "max-content", color: theme.palette.mode === "light" ? "#000" : theme.palette.text.primary }}>
                                 <Gear />
                             </IconButton>
+                        )}  */}
+                        {Nav_Buttons.map((el) => {
+                            // Check if the current URL matches the path of this button
+                            const isActive = location.pathname.trimEnd("#loaded") === getPath(el.index);
+
+                            // Fixed: Added explicit 'return' statement here
+                            return isActive ? (
+                                // ACTIVE STATE: Rendered if the URL matches this item
+                                <Box
+                                    key={el.index}
+                                    sx={{
+                                        background: theme.palette.primary.main,
+                                        borderRadius: 1.5
+                                    }}>
+                                    <IconButton
+                                        sx={{
+                                            width: "max-content",
+                                            color: "#fff"
+                                        }}>
+                                        {el.icon}
+                                    </IconButton>
+                                </Box>
+                            ) : (
+                                // INACTIVE STATE: Rendered for all other URLs
+                                <IconButton
+                                    key={el.index}
+                                    onClick={() => {
+                                        navigate(getPath(el.index));
+                                    }}
+                                    sx={{
+                                        width: "max-content",
+                                        color: theme.palette.mode === "light" ? "#000" : theme.palette.text.primary
+                                    }}>
+                                    {el.icon}
+                                </IconButton>
+                            );
+                        })}
+
+                        <Divider sx={{ width: "50px" }} />
+
+                        {/* Fixed: Evaluated the condition inline cleanly without dangling declarations */}
+                        {location.pathname === "/settings" || location.pathname === "Settings" ? (
+                            <Box
+                                sx={{
+                                    background: theme.palette.primary.main,
+                                    borderRadius: 1.5
+                                }}
+                            >
+                                <IconButton
+                                    sx={{ width: "max-content", color: "#fff" }}>
+                                    <Gear />
+                                </IconButton>
+                            </Box>
+                        ) : (
+                            <IconButton
+                                onClick={() => {
+                                    navigate("Settings");
+                                }}
+                                sx={{ width: "max-content", color: theme.palette.mode === "light" ? "#000" : theme.palette.text.primary }}>
+                                <Gear />
+                            </IconButton>
                         )}
+
                     </Stack>
                 </Stack>
 
@@ -367,22 +431,22 @@ const SideBar = () => {
                         <Stack>
                             {Profile_Menu.map((el, index) => (
                                 /* FIXED: Passes the current index to the refactored menu navigation handler */
-                                <MenuItem key={index} onClick={() =>{
+                                <MenuItem key={index} onClick={() => {
                                     handleProfileMenuClick(index)
                                     if (index === 2) {
                                         dispatch(logoutUser())
                                     }
-                                    
+
                                 }}>
-                            <Stack sx={{ width: 100 }} direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                                <span>{el.title}</span>
-                                {el.icon}
-                            </Stack>
-                        </MenuItem>
+                                    <Stack sx={{ width: 100 }} direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+                                        <span>{el.title}</span>
+                                        {el.icon}
+                                    </Stack>
+                                </MenuItem>
                             ))}
+                        </Stack>
+                    </Menu>
                 </Stack>
-            </Menu>
-        </Stack>
             </Stack >
         </Box >
     )
