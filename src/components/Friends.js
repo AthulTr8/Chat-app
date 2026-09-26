@@ -99,7 +99,7 @@ const FriendsRequestComponent = ({ firstName, lastName, _id, online, img, id }) 
 
 const FriendsComponent = ({ firstName, lastName, _id, online, img, id }) => {
     const theme = useTheme()
-
+    const user_id = window.localStorage.getItem("user_id")
     const name = `${firstName} ${lastName}`
     return (
         <>
@@ -126,6 +126,7 @@ const FriendsComponent = ({ firstName, lastName, _id, online, img, id }) => {
                     <Stack direction={"row"} spacing={2} alignItems={"center"}>
                         <IconButton onClick={()=>{
                             // Start new conversation
+                            socket.emit("Start_conversation",{to: _id, from: user_id})
                         }}>
                             <Chat />
                         </IconButton>

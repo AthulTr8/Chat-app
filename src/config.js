@@ -63,3 +63,4 @@ export const BASE_URL= "http://localhost:3030"
 
 // DEFAULT ROOT PATH
 export const DEFAULT_PATH = PATH_DASHBOARD.general.app; // as '/app'
+

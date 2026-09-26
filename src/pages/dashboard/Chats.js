@@ -3,14 +3,15 @@ import {
     InputBase, Button, Divider, Avatar, Badge
 } from '@mui/material'
 import { styled, alpha, useTheme } from '@mui/material/styles'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArchiveBox, CircleDashed, MagnifyingGlass, Users } from 'phosphor-react'
 import { ChatList } from '../../data';
 // import { SimpleBarStyle } from '../../components/Scrollbar'
 import { StyledBadge } from '../../components/StyleBadge';
 import Friends from '../../Sections/main/Friends';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChatElement } from '../../components/ChatElement';
+import { socket } from '../../socket';
 // FIX 1: Pass the { data } prop directly into the component parameters
 // const ChatElement = ({ data }) => {
 //     const dispatch = useDispatch()
@@ -155,13 +156,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-
+const user_id = window.localStorage.getItem("user_id")
 const Chats = () => {
+    
+    const {conversations} = useSelector((state) => state.conversation.direct_chat)
+    useEffect(() => {
+        socket.emit("get_direct_conversations",{user_id}, (data)=>{
+            // data => list of conversation
+            
+        })
+    }, [])
     const [openDialog, setOpenDialog] = useState(false)
-    const handleCloseDialog = ()=>{
+    const handleCloseDialog = () => {
         setOpenDialog(false)
     }
-    const handleOpenDialog = ()=>{
+    const handleOpenDialog = () => {
         setOpenDialog(true)
     }
 
@@ -199,7 +208,7 @@ const Chats = () => {
                             Chats
                         </Typography>
                         <Stack direction={'row'}>
-                            <IconButton onClick={()=>{
+                            <IconButton onClick={() => {
                                 handleOpenDialog()
                             }}>
                                 <Users size={24} />
@@ -297,7 +306,7 @@ const Chats = () => {
                     >
                         <Stack spacing={2}>
                             <Stack>
-                                <Typography
+                                {/* <Typography
                                     variant="subtitle2"
                                     sx={{ color: "#676767", mb: 1 }}
                                 >
@@ -306,7 +315,7 @@ const Chats = () => {
 
                                 {ChatList.filter((el) => el.pinned).map((ek) => (
                                     <ChatElement key={ek.id} data={ek} />
-                                ))}
+                                ))} */}
                             </Stack>
 
                             <Stack>
@@ -317,7 +326,7 @@ const Chats = () => {
                                     All Chats
                                 </Typography>
 
-                                {ChatList.filter((el) => !el.pinned).map((ek) => (
+                                {conversations.filter((el) => !el.pinned).map((ek) => (
                                     <ChatElement key={ek.id} data={ek} />
                                 ))}
                             </Stack>
@@ -327,7 +336,7 @@ const Chats = () => {
 
 
             </Box>
-            {openDialog && <Friends open={openDialog} handleClose={handleCloseDialog}/>}
+            {openDialog && <Friends open={openDialog} handleClose={handleCloseDialog} />}
         </>
     )
 }

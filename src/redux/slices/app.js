@@ -51,7 +51,7 @@ const slice = createSlice({
             state.friendRequests = action.payload.requests
         },
         selectConversation(state, action){
-            state.chat_type = "individual",
+            state.chat_type = "individual"
             state.room_id = action.payload.room_id
         }
     }
@@ -60,8 +60,8 @@ const slice = createSlice({
 export default slice.reducer
 
 
-export function toggleSideBar(dispatch, getState) {
-    return async () => {
+export function toggleSideBar() {
+    return async (dispatch, getState) => {
         dispatch(slice.actions.toggleSideBar())
     }
 }
