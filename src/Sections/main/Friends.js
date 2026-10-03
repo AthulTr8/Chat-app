@@ -9,13 +9,15 @@ const UsersList = () => {
     useEffect(() => {
         dispatch(fetchUsers())
     }, [])
-
+    const [hideUser, setHideUser] = useState([])
     const { users } = useSelector((state) => state.app)
+
+
     return (
         <>
-            {users.map((el, idx) => {
-
-                return <UserComponent key={el._id} {...el}/>
+            {users.map((el) => {
+              return   hideUser.includes(el._id)? null :
+                <UserComponent key={el._id} {...el}  onhide={() => setHideUser([...hideUser, el._id])} />
             })}
         </>
     )
@@ -32,7 +34,7 @@ const FriendsList = () => {
         <>
             {friends.map((el, idx) => {
 
-                return <FriendsComponent key={el._id} {...el}/>
+                return <FriendsComponent key={el._id} {...el} />
             })}
         </>
     )
@@ -50,7 +52,7 @@ const FriendsRequestList = () => {
         <>
             {friendRequests.map((el, idx) => {
 
-                return <FriendsRequestComponent key={el._id} {...el.sender} id={el._id}/>
+                return <FriendsRequestComponent key={el._id} {...el.sender} id={el._id} />
             })}
         </>
     )
@@ -73,7 +75,7 @@ const Friends = ({ open, handleClose }) => {
                     </Tabs>
                 </Stack>
                 {/* DialogContent */}
-                <DialogContent>
+                <DialogContent sx={{ overflowY: "scroll" }}>
                     <Stack sx={{ height: "100%" }}>
                         <Stack spacing={2.5}>
                             {(() => {

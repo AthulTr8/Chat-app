@@ -206,9 +206,25 @@ userSchema.methods.createPasswordResetToken = async function () {
 
 }
 
-userSchema.methods.changedPasswordAfter = async function (timeStamp) {
-    return timeStamp < this.PasswordChangedAt
-}
+// userSchema.methods.changedPasswordAfter = async function (timeStamp) {
+//     return timeStamp < this.PasswordChangedAt
+// }
+
+// Remove 'async' — this is a pure, synchronous comparison function
+userSchema.methods.changedPasswordAfter = function (timeStamp) {
+    // 1. Check if the field exists (use your exact schema casing, usually lowercase 'p')
+    if (this.passwordChangedAt) {
+        // 2. Convert database Milliseconds to JWT Seconds
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+
+        // 3. Return true if password was changed AFTER token was issued
+        return timeStamp < changedTimestamp;
+    }
+
+    // Default to false if the user has never changed their password
+    return false;
+};
+
 
 const User = new mongoose.model("User", userSchema)
 module.exports = User

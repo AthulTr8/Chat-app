@@ -409,11 +409,12 @@ exports.resetPassword = async (req, res, next) => {
 exports.protect = async (req, res, next) => {
 
     let token
-
-    if (req.headers.authorization && req.headers.authorization.startsWith("bearer")) {
+console.log(req.headers)
+    if (req.headers.authorization && req.headers.authorization.toLowerCase().startsWith("bearer")) {
         token = req.headers.authorization.split(" ")[1]
+        console.log(token)
     }
-    else if (req.cookies.jwt) {
+    else if (req.cookies?.jwt) {
         token = req.cookies.jwt
     } else {
         res.status(400).json({
@@ -434,11 +435,12 @@ exports.protect = async (req, res, next) => {
         return
     }
 
-    if (this_user.changedPasswordAfter(decode.iat)) {
+    if (this_user.changedPasswordAfter(decoded.iat)) {
         res.status(400).json({
             status: "error",
             message: "User recently updated password! please log in again"
         })
+        return;
     }
 
     req.user = this_user

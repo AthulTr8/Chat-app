@@ -23,7 +23,7 @@ const DashboardLayout = () => {
           window.location.reload()
         }
       }
-      window.onload()
+      // window.onload()
       if (!socket) {
         connectSocket(user_id)
       }

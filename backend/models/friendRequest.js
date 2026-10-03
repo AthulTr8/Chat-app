@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
 const requestSchema = new mongoose.Schema({
-    sender:{
+    sender: {
         type: mongoose.Schema.ObjectId,
-        ref:"User"
+        ref: "User"
     },
-    recipient:{
+    recipient: {
         type: mongoose.Schema.ObjectId,
-        ref:"User"
+        ref: "User"
     },
-    createdAt:{
+    createdAt: {
         type: Date,
         default: Date.now()
     }

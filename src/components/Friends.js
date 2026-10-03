@@ -1,8 +1,9 @@
 import { Avatar, Box, Button, IconButton, Stack, styled, Typography, useTheme } from '@mui/material'
-import React from 'react'
-import {StyledBadge} from "./StyleBadge"
-import {socket} from "../socket"
-import { Chat } from 'phosphor-react';
+import React, { useState } from 'react'
+import { StyledBadge } from "./StyleBadge"
+import { socket } from "../socket"
+import { Chat, X } from 'phosphor-react';
+
 const StyledChatBox = styled(Box)(({ theme }) => ({
     "&:hover": {
         cursor: "pointer",
@@ -11,10 +12,12 @@ const StyledChatBox = styled(Box)(({ theme }) => ({
 
 
 
-const UserComponent = ({ firstName, lastName, _id, online, img }) => {
+const UserComponent = ({ firstName, lastName, _id, online, img, onhide }) => {
     const theme = useTheme()
     const user_id = window.localStorage.getItem("user_id")
+    lastName ? lastName = lastName : lastName = ""
     const name = `${firstName} ${lastName}`
+     const [requestSent, setRequestSent] = useState(false);
     return (
         <>
             <StyledChatBox
@@ -37,17 +40,43 @@ const UserComponent = ({ firstName, lastName, _id, online, img }) => {
                             <Typography variant="subtitle2">{name}</Typography>
                         </Stack>
                     </Stack>
+                    {!requestSent ? 
                     <Stack direction={"row"} spacing={2} alignItems={"center"}>
                         <Button
                             onClick={() => {
                                 socket.emit("friend_request", { to: _id, from: user_id }, () => {
                                     alert("request sent");
                                 });
+                                setRequestSent(true)
                             }}
                         >
                             Send Request
                         </Button>
+                        <IconButton onClick={onhide}>
+                            <X/>
+                        </IconButton>
                     </Stack>
+                    :<Stack direction={"row"} spacing={2} alignItems={"center"}>
+                        <Button
+                            disabled
+                            onClick={() => {
+                                socket.emit("friend_request", { to: _id, from: user_id }, () => {
+                                    alert("request sent");
+                                });
+                            }}
+                        >
+                            Request pending
+                        </Button>
+                        <IconButton onClick={()=>{
+                            socket.emit("cancel_request",{user_id: user_id, to: _id},()=>{
+                                alert("request cancelled")
+                            })
+                            setRequestSent(false)
+                        }}>
+                            <X/>
+                        </IconButton>
+                    </Stack>}
+                    
                 </Stack>
             </StyledChatBox>
         </>
@@ -56,7 +85,8 @@ const UserComponent = ({ firstName, lastName, _id, online, img }) => {
 
 const FriendsRequestComponent = ({ firstName, lastName, _id, online, img, id }) => {
     const theme = useTheme()
-    // const user_id = window.localStorage.getItem("user_id")
+    //  const user_id = window.localStorage.getItem("user_id")
+    const [acceptRequest, setAcceptRequest] = useState(false);
     const name = `${firstName} ${lastName}`
     return (
         <>
@@ -83,12 +113,14 @@ const FriendsRequestComponent = ({ firstName, lastName, _id, online, img, id }) 
                     <Stack direction={"row"} spacing={2} alignItems={"center"}>
                         <Button
                             onClick={() => {
-                                socket.emit("accept_request", { request_id: id }, () => {
+                                socket.emit("accept_requests", { request_id: id }, () => {
                                     alert("request sent");
+                                    console.log("inside emit");
                                 });
+                                setAcceptRequest(true)
                             }}
                         >
-                            Accept Request
+                            {acceptRequest? "Message": "Accept Request"}
                         </Button>
                     </Stack>
                 </Stack>
@@ -124,9 +156,9 @@ const FriendsComponent = ({ firstName, lastName, _id, online, img, id }) => {
                         </Stack>
                     </Stack>
                     <Stack direction={"row"} spacing={2} alignItems={"center"}>
-                        <IconButton onClick={()=>{
+                        <IconButton onClick={() => {
                             // Start new conversation
-                            socket.emit("Start_conversation",{to: _id, from: user_id})
+                            socket.emit("Start_conversation", { to: _id, from: user_id })
                         }}>
                             <Chat />
                         </IconButton>
