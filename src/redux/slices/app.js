@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 // 
 // import { dispatch } from "../store";
-axios.defaults.baseURL = 'http://localhost:3030'; 
+axios.defaults.baseURL = 'http://localhost:3030';
 const initialState = {
     sidebar: {
         open: false,
@@ -18,6 +18,7 @@ const initialState = {
     friendRequests: [],
     chat_type: null,
     room_id: null,
+    // conversations: []
 }
 
 const slice = createSlice({
@@ -50,15 +51,18 @@ const slice = createSlice({
         updateFriendRequests(state, action) {
             state.friendRequests = action.payload.requests
         },
-        selectConversation(state, action){
+        selectConversation(state, action) {
             state.chat_type = "individual"
             state.room_id = action.payload.room_id
-        }
+        },
+        // updateConversations(state, action) {
+        //     state.conversations = action.payload.conversations;
+        // }
     }
 })
 
 export default slice.reducer
-
+// export const { updateConversations } = slice.actions;
 
 export function toggleSideBar() {
     return async (dispatch, getState) => {
@@ -91,26 +95,26 @@ export const closeSnackBar = () => async (dispatch, getState) => {
     dispatch(slice.actions.closeSnackBar());
 }
 
-export const fetchUsers =  () => {
+export const fetchUsers = () => {
     return async (dispatch, getState) => {
-        
+
         try {
             console.log(getState().auth.token)
-             await axios.get("/user/get-user", {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `bearer ${getState().auth.token}`
-            }
-        }).then((response) => {
-            console.log(response)
-            dispatch(slice.actions.updateUsers({users: response.data.data}))
-        }).catch((error) => {
-            console.log(error)
-        })
+            await axios.get("/user/get-user", {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `bearer ${getState().auth.token}`
+                }
+            }).then((response) => {
+                console.log(response)
+                dispatch(slice.actions.updateUsers({ users: response.data.data }))
+            }).catch((error) => {
+                console.log(error)
+            })
         } catch (error) {
             console.log(error)
         }
-       
+
     }
 }
 export const fetchFriends = () => {
@@ -121,10 +125,10 @@ export const fetchFriends = () => {
                 Authorization: `Bearer ${getState().auth.token}`
             }
         }).then((response) => {
-            console.log("Success:"+response)
-            dispatch(slice.actions.updateFriends({friends: response.data.data}))
+            console.log("Success:" + response)
+            dispatch(slice.actions.updateFriends({ friends: response.data.data }))
         }).catch((error) => {
-            console.log("Error:"+error)
+            console.log("Error:" + error)
         })
     }
 }
@@ -148,7 +152,7 @@ export const fetchFriendRequests = () => {
     return async (dispatch, getState) => {
         try {
             const token = getState().auth.token;
-            
+
             // Await the response cleanly from your Express backend
             const response = await axios.get("/user/get-friend-requests", {
                 headers: {
@@ -158,7 +162,7 @@ export const fetchFriendRequests = () => {
             });
 
             console.log("Friend Requests Response:", response);
-            
+
             // Dispatching the clean payload to your Redux slice
             dispatch(slice.actions.updateFriendRequests({ requests: response.data.data }));
 
@@ -169,8 +173,14 @@ export const fetchFriendRequests = () => {
     };
 };
 
-export const SelectConversation = ({room_id})=>{
-    return (dispatch, getState)=>{
-        dispatch(slice.actions.selectConversation({room_id}))
+export const SelectConversation = ({ room_id }) => {
+    return (dispatch, getState) => {
+        dispatch(slice.actions.selectConversation({ room_id }))
     }
 }
+
+// export const FetchConversations = ({ conversations }) => {
+//     return (dispatch, getState) => {
+//         dispatch(slice.actions.updateConversations({ conversations }));
+//     };
+// };

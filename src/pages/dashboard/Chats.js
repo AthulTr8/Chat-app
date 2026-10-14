@@ -12,6 +12,7 @@ import Friends from '../../Sections/main/Friends';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatElement } from '../../components/ChatElement';
 import { socket } from '../../socket';
+import { FetchDirectConversation } from '../../redux/slices/conversation';
 // FIX 1: Pass the { data } prop directly into the component parameters
 // const ChatElement = ({ data }) => {
 //     const dispatch = useDispatch()
@@ -158,14 +159,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const user_id = window.localStorage.getItem("user_id")
 const Chats = () => {
-    
+    console.log("user_id: "+user_id)
+    const dispatch = useDispatch()
+    //  const conversations = useSelector((state) => state.app.conversations);
     const {conversations} = useSelector((state) => state.conversation.direct_chat)
     useEffect(() => {
-        socket.emit("get_direct_conversations",{user_id}, (data)=>{
+        socket.emit("get_direct_conversations", { user_id }, (data) => {
             // data => list of conversation
-            
+            console.log("Fetched conversation payload:", data);
+
+            // Dispatch data to Redux store instantly
+            dispatch(FetchDirectConversation({ conversations: data }));
         })
-    }, [])
+    }, [dispatch, user_id])
+
+    // const conversations = useSelector((state) => state.app.conversations);
+    // const safeConversations = Array.isArray(conversations) ? conversations : [];
+
     const [openDialog, setOpenDialog] = useState(false)
     const handleCloseDialog = () => {
         setOpenDialog(false)
@@ -305,8 +315,8 @@ const Chats = () => {
                         }}
                     >
                         <Stack spacing={2}>
-                            <Stack>
-                                {/* <Typography
+                            {/* <Stack>
+                                <Typography
                                     variant="subtitle2"
                                     sx={{ color: "#676767", mb: 1 }}
                                 >
@@ -315,8 +325,8 @@ const Chats = () => {
 
                                 {ChatList.filter((el) => el.pinned).map((ek) => (
                                     <ChatElement key={ek.id} data={ek} />
-                                ))} */}
-                            </Stack>
+                                ))}
+                            </Stack> */}
 
                             <Stack>
                                 <Typography
@@ -329,6 +339,13 @@ const Chats = () => {
                                 {conversations.filter((el) => !el.pinned).map((ek) => (
                                     <ChatElement key={ek.id} data={ek} />
                                 ))}
+                                {/* {safeConversations
+                                    .filter((el) => !el.pinned)
+                                    .map((ek) => (
+                                        // Ensure ek._id or ek.id matches your schema properties format!
+                                        <ChatElement key={ek._id || ek.id} data={ek} />
+                                    ))
+                                } */}
                             </Stack>
                         </Stack>
                     </Box>

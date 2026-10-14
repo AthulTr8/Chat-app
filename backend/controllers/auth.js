@@ -257,7 +257,7 @@ exports.register = async (req, res, next) => {
 
 exports.sendOtp = async (req, res, next) => {
     try {
-        console.log("reached send otp");
+        // console.log("reached send otp");
         const { userId } = req; // This comes from your register controller!
 
         // 1. FETCH THE ACTUAL USER FROM THE DATABASE

@@ -2,6 +2,7 @@ import { Avatar, Badge, Box, Stack, Typography, useTheme } from "@mui/material";
 import { StyledBadge } from "./StyleBadge";
 import { useDispatch } from "react-redux";
 import { SelectConversation } from "../redux/slices/app";
+// import { socket } from "../socket";
 
 export const ChatElement = ({ data }) => {
     const theme = useTheme();
@@ -13,6 +14,7 @@ export const ChatElement = ({ data }) => {
         }}
         sx={{
             width: "100%",
+            maxHeight:"65px",
             background: theme.palette.mode === "light" ? "#fff" : theme.palette.background.paper,
             borderRadius: 1,
             mb: 1.5 // Added a bottom margin to separate items in the list cleanly
@@ -39,14 +41,17 @@ export const ChatElement = ({ data }) => {
                         {/* console.log(faker.image.avatar()); */}
                     </StyledBadge>
 
-                    <Stack spacing={0.3}>
+                    <Stack spacing={0.1}>
                         {/* FIX 3: Dynamic Data mapping assertions */}
                         <Typography variant='subtitle2'>
                             {data.name}
                         </Typography>
+                         <div style={{ width: 120, whiteSpace: 'nowrap' }}>
+                        <Box component={"div"} sx={{ textOverflow: 'ellipsis', overflow: 'hidden', }}>
                         <Typography variant='caption'>
                             {data.msg}
                         </Typography>
+                        </Box></div>
                     </Stack>
 
                 </Stack>

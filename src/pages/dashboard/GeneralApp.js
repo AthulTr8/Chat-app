@@ -23,7 +23,7 @@ const GeneralApp = () => {
       }}>
 
         {/* Conversation */}
-        {room_id !== null && chat_type === "individual" ? <Conversation /> : <>
+        {room_id !== null && chat_type === "individual" ? <Conversation  /> : <>
           <Stack spacing={2} sx={{
             height: "100%", width: "100%"
           }} alignItems={"center"} justifyContent={"center"}>

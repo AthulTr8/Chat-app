@@ -24,27 +24,62 @@ const TimeLine = ({ el }) => {
 }
 
 
+// const TestMsg = ({ el, menu }) => {
+//     const theme = useTheme();
+//     return (
+//         <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"} >
+//             <Box sx={{
+//                 background: el.incoming ? theme.palette.background.default : theme.palette.primary.main,
+//                 borderRadius: 1.5,
+//                 width: "max-contents"
+//             }} p={1.5}>
+//                 <Typography variant='body2' sx={{ color: el.incoming ? theme.palette.background.text : " #fff" }}>
+//                     {el.message}
+//                 </Typography>
+
+//             </Box>
+//             {menu && <MessageOptions /> }
+
+
+//         </Stack>
+//     )
+// }
+
 const TestMsg = ({ el, menu }) => {
     const theme = useTheme();
+
+    // 1. Get your logged-in user ID to determine if you sent this message
+    const current_user_id = window.localStorage.getItem("user_id");
+
+    // 2. If 'from' matches your ID, you are the sender (render on the right side)
+    const isIncoming = el.from !== current_user_id;
+
     return (
-        <Stack direction={'row'} justifyContent={el.incoming ? "start" : "end"} >
-            <Box sx={{
-                background: el.incoming ? theme.palette.background.default : theme.palette.primary.main,
-                borderRadius: 1.5,
-                width: "max-contents"
-            }} p={1.5}>
-                <Typography variant='body2' sx={{ color: el.incoming ? theme.palette.background.text : " #fff" }}>
-                    {el.message}
+        <Stack direction={'row'} justifyContent={isIncoming ? "flex-start" : "flex-end"}>
+            <Box
+                sx={{
+                    background: isIncoming ? theme.palette.background.default : theme.palette.primary.main,
+                    borderRadius: 1.5,
+                    width: "max-content", // Fixed typo: 'max-contents' to 'max-content',
+                    maxWidth: "400px",
+                    height: "max-content",
+                    overflowWrap: " break-word",
+                    wordBreak: 'break-word'
+                }}
+                p={1}
+            >
+                <Typography
+                    variant='body2'
+                    sx={{ color: isIncoming ? theme.palette.text.primary : "#fff" }}
+                >
+                    {/* ✅ FIXED: Reads the exact 'text' property from your MongoDB log! */}
+                    {el.text}
                 </Typography>
-
             </Box>
-            {menu && <MessageOptions /> }
-            
-
+            {menu && <MessageOptions />}
         </Stack>
-    )
-}
-
+    );
+};
 
 
 const MediaMsg = ({ el, menu }) => {
@@ -63,8 +98,8 @@ const MediaMsg = ({ el, menu }) => {
                 </Stack>
 
             </Box>
-             {menu && <MessageOptions /> }
-            
+            {menu && <MessageOptions />}
+
         </Stack>
 
     )
@@ -92,7 +127,7 @@ const ReplyMsg = ({ el, menu }) => {
                     </Typography>
                 </Stack>
             </Box>
-             {menu && <MessageOptions /> }
+            {menu && <MessageOptions />}
         </Stack>
     )
 }
@@ -124,7 +159,7 @@ const LinkMsg = ({ el, menu }) => {
                     </Stack>
                 </Stack>
             </Box>
-            {menu && <MessageOptions /> }
+            {menu && <MessageOptions />}
         </Stack>
 
     )
@@ -155,7 +190,7 @@ const Docmsg = (el, menu) => {
                     </Typography>
                 </stack>
             </Box>
-            {menu && <MessageOptions /> }
+            {menu && <MessageOptions />}
         </Stack>
     )
 }

@@ -74,7 +74,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
-    console.log("👉 1. Body after parsers:", req.body);
+    // console.log("👉 1. Body after parsers:", req.body);
     next();
 });
 app.use(helmet());
@@ -98,7 +98,7 @@ app.use(express.urlencoded({ extended: true }));
 // 3. USE THE MODERN SANITIZER
 app.use(mongosanitize());
 app.use((req, res, next) => {
-    console.log("👉 2. Body before routes:", req.body);
+    // console.log("👉 2. Body before routes:", req.body);
     next();
 });
 

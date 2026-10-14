@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 const oneToOneMessageSchema = new mongoose.Schema({
-    participacts: [{
+    participants: [{
         type: mongoose.Schema.ObjectId,
         ref: "User"
     }],
@@ -16,20 +16,25 @@ const oneToOneMessageSchema = new mongoose.Schema({
         },
         type: {
             type: String,
-            enum:["Text", "Media", "Document", "Link"]
+            enum: ["msg", "divider"]
         },
-        created_at:{
+        subtype: {
+            type: String,
+            enum: ["text", "reply", "video", "link", "doc", "img"]
+        },
+
+        created_at: {
             type: Date,
             default: Date.now()
         },
-        text:{
-            type:String
+        text: {
+            type: String
         },
-        file:{
-            type:String
+        file: {
+            type: String
         }
     }]
 })
 
 const OneToOneMessage = new mongoose.model("onetoonemessage", oneToOneMessageSchema)
-module.exports = oneToOneMessageSchema
+module.exports = OneToOneMessage

@@ -75,88 +75,10 @@ const userSchema = new mongoose.Schema({
         enum: ["Online", "Offline"]
     }
 })
-// userSchema.pre("save", async function () {
-//     // 1. If password was added or changed, hash it!
-//     try {
-//         if (this.isModified("password") && this.password) {
-//         if (!this.password.startsWith('$2')) {
-//             this.password = await bcrypt.hash(this.password, 12);
-//         }
-//     }
-//     } catch (error) {
-//         console.log(`error: ${error}`)
-//     }
 
-
-//     // 2. If OTP was added or changed, hash it!
-//     if (this.isModified("otp") && this.otp) {
-//         const otpString = this.otp.toString();
-//         if (!otpString.startsWith('$2')) {
-//             this.otp = await bcrypt.hash(otpString, 12);
-//         }
-//     }
-
-//     // Notice: NO next() or return next() anywhere in this function!
-//     // Simply letting the async function finish tells Mongoose it's safe to save.
-// });
-
-// // Replace both of your old userSchema.pre("save") blocks with this:
-// userSchema.pre("save", async function () {
-//     // 1. Handle OTP Hashing safely
-//     if (this.isModified("otp") && this.otp) {
-//         // Convert the numeric OTP to a string so bcrypt can hash it!
-//         this.otp = await bcrypt.hash(this.otp.toString(), 12);
-//     }
-
-//     // 2. Handle Password Hashing safely
-//     if (this.isModified("password") && this.password) {
-//         this.password = await bcrypt.hash(this.password, 12);
-//     }
-// });
-// userSchema.pre("save", async function (next) {
-//     try {
-//         // 1. If password was added or changed, hash it!
-//         if (this.isModified("password") && this.password) {
-//             // Check if it's already a bcrypt hash (starts with $2) to avoid double hashing
-//             if (!this.password.startsWith('$2')) {
-//                 this.password = await bcrypt.hash(this.password, 12);
-//             }
-//         }
-
-//         // 2. If OTP was added or changed, hash it!
-//         if (this.isModified("otp") && this.otp) {
-//             const otpString = this.otp.toString();
-//             if (!otpString.startsWith('$2')) {
-//                 this.otp = await bcrypt.hash(otpString, 12);
-//             }
-//         }
-
-//         next(); // Use next() at the absolute end of the catch block
-//     } catch (err) {
-//         next(err);
-//     }
-// });
-
-// userSchema.pre("save", async function (next) {
-
-//     if (!this.isModified("otp")) return next()
-//     //hashing the otp with the cost of 12
-//     this.otp = await bcrypt.hash(this.otp, 12)
-
-//     next()
-// })
-
-// userSchema.pre("save", async function (next) {
-
-//     if (!this.isModified("password")) return next()
-//     //hashing the otp with the cost of 12
-//     this.password = await bcrypt.hash(this.password, 12)
-
-//     next()
-// })
 userSchema.pre("save", async function () {
     try {
-        // 👉 FORCE MONGOOSE TO TRACK CHANGES IF A PASSWORD VALUE EXISTS IN THE OPERATION
+        
         if (this.password && !this.password.startsWith('$2')) {
             this.markModified('password');
         }

@@ -53,7 +53,7 @@ io.on("connection", async (socket) => {
     // socket event listener here
 
     socket.on("friend_request", async (data) => {
-        console.log(data.to)
+        // console.log(data.to)
         //  data=>{to, from}
         const to_User = await User.findById(data.to).select("soket_id")
         const from_User = await User.findById(data.from).select("soket_id")
@@ -75,31 +75,73 @@ io.on("connection", async (socket) => {
             message: "Request sent successfully"
         })
     })
+    // socket.on("accept_requests", async (data) => {
+    //     // console.log(`inside socket accept request`)
+    //     // console.log(data)
+    //     const request_doc = await FriendRequest.findById(data.request_id)
+    //     // console.log(request_doc)
+    //     if (!request_doc) return
+    //     // request_id
+    //     const sender = await User.findById(request_doc.sender)
+    //     const receiver = await User.findById(request_doc.recipient)
+
+    //     sender.friends.push(request_doc.recipient)
+    //     receiver.friends.push(request_doc.sender)
+
+    //     await receiver.save({ new: true, validateModifiedOnly: true })
+    //     await sender.save({ new: true, validateModifiedOnly: true })
+
+    //     await FriendRequest.findByIdAndDelete(data.request_id)
+
+    //     io.to(sender.socket_id).emit("request_acceepted", {
+    //         message: "Friend request accepted"
+    //     })
+    //     io.to(receiver.socket_id).emit("request_acceepted", {
+    //         message: "Friend request accepted"
+    //     })
+    // })
     socket.on("accept_requests", async (data) => {
-        console.log(`inside socket accept request`)
-        console.log(data)
-        const request_doc = await FriendRequest.findById(data.request_id)
-        console.log(request_doc)
+        try {
+            // 1. Find the friend request
+            const request_doc = await FriendRequest.findById(data.request_id);
+            if (!request_doc) {
+                return socket.emit("error", { message: "Friend request not found" });
+            }
 
-        // request_id
-        const sender = await User.findById(request_doc.sender)
-        const receiver = await User.findById(request_doc.recipient)
+            // 2. Fetch sender and receiver users
+            const sender = await User.findById(request_doc.sender);
+            const receiver = await User.findById(request_doc.recipient);
 
-        sender.friends.push(request_doc.recipient)
-        receiver.friends.push(request_doc.sender)
+            if (!sender || !receiver) {
+                return socket.emit("error", { message: "User(s) not found" });
+            }
 
-        await receiver.save({ new: true, validateModifiedOnly: true })
-        await sender.save({ new: true, validateModifiedOnly: true })
+            // 3. Prevent duplicate entries using .includes() or check logic
+            if (!sender.friends.includes(request_doc.recipient)) {
+                sender.friends.push(request_doc.recipient);
+            }
+            if (!receiver.friends.includes(request_doc.sender)) {
+                receiver.friends.push(request_doc.sender);
+            }
 
-        await FriendRequest.findByIdAndDelete(data.request_id)
+            // 4. Save without invalid 'new: true' option
+            await receiver.save({ validateModifiedOnly: true });
+            await sender.save({ validateModifiedOnly: true });
 
-        io.to(sender.socket_id).emit("request_acceepted", {
-            message: "Friend request accepted"
-        })
-        io.to(receiver.socket_id).emit("request_acceepted", {
-            message: "Friend request accepted"
-        })
-    })
+            // 5. Clean up the request
+            await FriendRequest.findByIdAndDelete(data.request_id);
+
+            // 6. Notify both parties (fixed typo to 'request_accepted')
+            if (sender.socket_id) {
+                io.to(sender.socket_id).emit("request_accepted", { message: "Friend request accepted" });
+            }
+            if (receiver.socket_id) {
+                io.to(receiver.socket_id).emit("request_accepted", { message: "Friend request accepted" });
+            }
+        } catch (error) {
+            console.error("Error accepting friend request:", error);
+        }
+    });
 
     socket.on("cancel_request", async ({ user_id, to }) => {
         await FriendRequest.findOneAndDelete({
@@ -109,76 +151,150 @@ io.on("connection", async (socket) => {
     })
 
     socket.on("get_direct_conversations", async ({ user_id }, callback) => {
+        // console.log("inside get_direct_conversation")
         const existing_conversation = await oneToOneMessage.find({
             participants: { $all: [user_id] }
         }).populate("participants", "firstName lastName _id email status")
-        console.log(existing_conversation)
+        // console.log(existing_conversation)
 
         callback(existing_conversation)
     })
 
-    socket.on("start_conversation", async (data) => {
+    socket.on("Start_conversation", async (data) => {
         // data:{to, from}
+        // console.log(`inside Start_conversation`)
         const { to, from } = data
         // check is there any existing conversation between these users
-        const existing_conversation = await oneToOneMessage.find({
-            participants: {
-                $size: 2, $all: [to, from]
+        try {
+            const existing_conversation = await oneToOneMessage.find({
+                participants: {
+                    $size: 2, $all: [to, from]
+                }
+            }).populate("participants", "firstName lastName _id email status")
+            console.log(existing_conversation[0], "Existing Conversation")
+
+            if (existing_conversation.length === 0) {
+                let new_chat = await oneToOneMessage.create({
+                    participants: [to, from]
+                })
+
+                new_chat = await oneToOneMessage.findById(new_chat._id).populate("participants", "firstName lastName _id email status")
+                console.log(new_chat)
+                socket.emit("start_chat", new_chat)
             }
-        }).populate("participants", "firstName lastName _id email status")
-        console.log(existing_conversation[0], "Existing Conversation")
+            // if there is existing customer
+            else {
+                socket.emit("start_chat", existing_conversation[0])
+            }
 
-        if (existing_conversation.length === 0) {
-            let new_chat = await oneToOneMessage.create({
-                participants: [to, from]
-            })
-
-            new_chat = await oneToOneMessage.findById(new_chat._id).populate("participants", "firstName lastName _id email status")
-            console.log(new_chat)
-            socket.emit("start_chat", new_chat)
-        }
-        // if there is existing customer
-        else {
-            socket.emit("start_chat", existing_conversation[0])
+        } catch (error) {
+            console.log(error)
         }
     })
+
     socket.on("get_messages", async (data, callback) => {
         const { messages } = await oneToOneMessage.findById(data.conversation_id).select("messages")
         callback(messages)
     })
     // Handle text/link messages
-    socket.on("text_message", async (data) => {
-        console.log("Recevied Message: ", data)
-        // data : {to, from, text, conversation_id, type}
-        const { to, from, message, conversation_id, type } = data
+    // socket.on("text_message", async (data) => {
+    //     console.log("Recevied Message: ", data)
+    //     // data : {to, from, text, conversation_id, type}
+    //     const { to, from, message, conversation_id, type } = data
 
-        const to_user = await User.findById(to)
-        const from_user = await User.findById(from)
+    //     const to_user = await User.findById(to)
+    //     const from_user = await User.findById(from)
 
-        const new_message = {
-            to,
-            from,
-            type,
-            text: message,
-            createdAt: Date.now()
+    //     const new_message = {
+    //         to,
+    //         from,
+    //         type,
+    //         text: message,
+    //         createdAt: Date.now()
+    //     }
+    //     // create a new conversation if it doesn't exist yet or add new
+    //     const chat = await oneToOneMessage.findById(conversation_id)
+    //     chat.messages.push( new_message )
+    //     // save to DB
+    //     await chat.save({})
+
+    //     // emit new_message -> to user
+    //     io.to(to_user.socket_id).emit("new_message", {
+    //         conversation_id,
+    //         message: new_message
+    //     })
+    //     // emit new_message -> from user
+    //     io.to(from_user.socket_id).emit("new_message", {
+    //         conversation_id,
+    //         message: new_message
+    //     })
+    // })
+    // Fixed: Added callback parameter signature to handle frontend confirmations
+    socket.on("text_message", async (data, callback) => {
+        try {
+            console.log("Received Message: ", data);
+
+            // Fix 1: Destructured 'text' to match your frontend payload key precisely!
+            const { to, from, message, conversation_id, type, subtype } = data;
+
+            const to_user = await User.findById(to);
+            const from_user = await User.findById(from);
+
+            // Fix 3: Manually instantiate a fresh, unique ObjectId for this specific message bubble
+            const new_message = {
+                _id: new mongoose.Types.ObjectId(),
+                to,
+                from,
+                type,
+                text: message, // Correctly linked to your incoming string text value
+                subtype: subtype,
+                createdAt: Date.now(),
+
+            };
+
+            const chat = await oneToOneMessage.findById(conversation_id);
+            if (!chat) {
+                console.error("Conversation room window not found in database!");
+                return;
+            }
+
+            // chat.messages.push(new_message);
+            // await chat.save({ validateModifiedOnly: true });
+            const updatedChat = await oneToOneMessage.findByIdAndUpdate(
+                conversation_id,
+                { $push: { messages: new_message } },
+                { new: true, runValidators: false } // Bypasses old array entry blocks
+            );
+
+            if (!updatedChat) {
+                console.error("Conversation room window not found in database!");
+                return;
+            }
+
+            // Fix 2: Execute acknowledgment function trigger to alert your frontend instantly
+            if (typeof callback === "function") {
+                callback({ status: "Success", message: new_message });
+            }
+
+            // Emit real-time updates down active socket pipe channels
+            if (to_user?.socket_id) {
+                io.to(to_user.socket_id).emit("new_message", {
+                    conversation_id,
+                    message: new_message
+                });
+            }
+            if (from_user?.socket_id) {
+                io.to(from_user.socket_id).emit("new_message", {
+                    conversation_id,
+                    message: new_message
+                });
+            }
+
+        } catch (error) {
+            console.error("🚨 Critical error inside backend text_message pipeline:", error);
         }
-        // create a new conversation if it doesn't exist yet or add new
-        const chat = await oneToOneMessage.findById(conversation_id)
-        chat.messages.push({ new_message })
-        // save to DB
-        await chat.save({})
+    });
 
-        // emit new_message -> to user
-        io.to(to_User.socket_id).emit("new_message", {
-            conversation_id,
-            message: new_message
-        })
-        // emit new_message -> from user
-        io.to(from_User.socket_id).emit("new_message", {
-            conversation_id,
-            message: new_message
-        })
-    })
 
     socket.on("file_message", (data) => {
         console.log("received Message:", data)
